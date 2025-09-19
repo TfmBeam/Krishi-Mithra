@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
         llm = LlamaCpp(
             model_path=model_path,
             temperature=0.7,
-            max_tokens=512,
+            max_tokens=256,
             n_ctx=4096,
             verbose=False,
         )
@@ -80,7 +80,7 @@ class QueryRequest(BaseModel):
     query: str
     language: str = None 
 
-def perform_vector_search(embedding, k: int = 5):
+def perform_vector_search(embedding, k: int = 3):
     """
     Performs a vector similarity search on the Supabase table.
     Returns the top k most similar document chunks.
