@@ -9,3 +9,5 @@ setnence_transformer
 pypdf
 fastapi
 llama-cpp-python
+langdetect
+flutter
