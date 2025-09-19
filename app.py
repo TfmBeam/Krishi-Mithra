@@ -146,7 +146,8 @@ async def handle_query(request: QueryRequest):
         response_lang = request.language
     elif detected_lang == 'en':
         # Default to Malayalam if the user does not specify a language
-        response_lang = 'ml'
+        #response_lang = 'ml'
+        response_lang - 'en'
 
     # 3. Embed the user's query
     query_embedding = embedding_model.embed_query(query)
