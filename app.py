@@ -9,6 +9,7 @@ from langchain_community.llms import LlamaCpp
 from langchain_core.prompts import PromptTemplate
 from contextlib import asynccontextmanager
 from langdetect import detect # Import the langdetect library
+from fastapi.middleware.cors import CORSMiddleware
 
 # Suppress warnings for a cleaner output
 warnings.filterwarnings("ignore")
@@ -74,6 +75,14 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastAPI app with the lifespan context
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For hackathon/demo, allow all
+    allow_credentials=True,
+    allow_methods=["*"],   # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],   # Allow all headers
+)
 
 # Pydantic model for the request body
 class QueryRequest(BaseModel):
