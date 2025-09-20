@@ -167,3 +167,32 @@ async def handle_query(request: QueryRequest):
         return {"answer": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM generation failed: {str(e)}")
+    
+from fastapi import UploadFile, File
+import requests
+
+KINDWISE_API_KEY = os.getenv("KINDWISE_API_KEY")  # set in .env
+
+@app.post("/image_query")
+async def handle_image_query(file: UploadFile = File(...), language: str = None):
+    """
+    Handle image input -> classify using Kindwise -> pass to RAG pipeline
+    """
+    try:
+        # 1. Send image to Kindwise API
+        files = {"file": (file.filename, await file.read(), file.content_type)}
+        headers = {"Authorization": f"Bearer {KINDWISE_API_KEY}"}
+        response = requests.post("https://api.kindwise.com/classify", files=files, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Kindwise API failed: {response.text}")
+
+        result = response.json()
+        classification_text = result.get("label", "unknown issue")
+
+        # 2. Reuse existing query pipeline
+        query_req = QueryRequest(query=classification_text, language=language)
+        return await handle_query(query_req)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
